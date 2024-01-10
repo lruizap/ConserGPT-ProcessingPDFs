@@ -104,12 +104,5 @@ path_txt = './pdf_to_txt/Circular25julio2023ReligionyAtencionEducativa.txt'
 
 quitar_cabecera_pie(path, path)
 cortar_pdf_desde_anexo(path)
-
-input_pdf = './pdf_sinCabecera/Circular25julio2023ReligionyAtencionEducativa.pdf'
-output_txt = './salida/Circular25julio2023ReligionyAtencionEducativa.txt'
-
-limpiar_y_convertir_a_txt(path,
-                          path_txt)
-
-procesar_archivo(input_txt_path=path_txt,
-                 output_txt_path=path_txt)
+limpiar_y_convertir_a_txt(path, path_txt)
+procesar_archivo(path_txt, path_txt)
