@@ -102,7 +102,9 @@ def procesar_archivo(input_txt_path, output_txt_path):
 path = './pdf_to_txt/Circular25julio2023ReligionyAtencionEducativa.pdf'
 path_txt = './pdf_to_txt/Circular25julio2023ReligionyAtencionEducativa.txt'
 
-quitar_cabecera_pie(path, path)
-cortar_pdf_desde_anexo(path)
-limpiar_y_convertir_a_txt(path, path_txt)
-procesar_archivo(path_txt, path_txt)
+
+def processing_pdf(path, path_txt):
+    quitar_cabecera_pie(path, path)
+    cortar_pdf_desde_anexo(path)
+    limpiar_y_convertir_a_txt(path, path_txt)
+    procesar_archivo(path_txt, path_txt)
