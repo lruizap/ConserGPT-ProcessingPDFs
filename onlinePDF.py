@@ -1,4 +1,3 @@
-# from langchain.document_loaders import OnlinePDFLoader
 import cv2
 from langchain_community.document_loaders import OnlinePDFLoader
 
@@ -7,3 +6,28 @@ loader = OnlinePDFLoader(
 document = loader.load()
 
 print(document)
+
+#!######################################
+
+# from urllib.request import Request, urlopen
+# from PyPDF2 import PdfWriter, PdfReader
+# from io import StringIO
+
+# url = "https://www.adideandalucia.es/normas/ordenes/Orden15abril2011SubvencionesAsociaciones.pdf"
+# writer = PdfWriter()
+
+# remoteFile = urlopen(Request(url)).read()
+# memoryFile = StringIO(remoteFile)
+# pdfFile = PdfReader(memoryFile)
+
+# for pageNum in range(pdfFile.getNumPages()):
+#     currentPage = pdfFile.getPage(pageNum)
+#     # currentPage.mergePage(watermark.getPage(0))
+#     writer.addPage(currentPage)
+
+
+# outputStream = open("output.pdf", "wb")
+# writer.write(outputStream)
+# outputStream.close()
+
+#!######################################
