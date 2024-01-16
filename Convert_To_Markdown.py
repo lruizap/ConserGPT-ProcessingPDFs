@@ -3,10 +3,24 @@ import re
 import requests
 from PyPDF2 import PdfReader
 
+list_order_fem = ['PRIMERA', 'SEGUNDA', 'TERCERA', 'CUARTA', 'QUINTA', 'SEXTA', 'SÉPTIMA', 'OCTAVA', 'NOVENA', 'DÉCIMA',
+                  'UNDÉCIMA', 'DUODÉCIMA', 'DECIMOTERCERA', 'DECIMOCUARTA', 'DECIMOQUINTA', 'DECIMOSEXTA', 'DECIMOSÉPTIMA',
+                  'DECIMOCTAVA', 'DECIMONOVENA', 'VIGÉSIMA', 'VIGÉSIMA PRIMERA', 'VIGÉSIMA SEGUNDA', 'VIGÉSIMA TERCERA',
+                  'VIGÉSIMA CUARTA', 'VIGÉSIMA QUINTA']
+
+list_order_masc = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo',
+                   'Undécimo', 'Duodécimo', 'Decimotercero', 'Decimocuarto', 'Decimoquinto', 'Decimosexto', 'Decimoséptimo',
+                   'Decimoctavo', 'Decimonoveno', 'Vigésimo', 'Vigésimo primero', 'Vigésimo segundo', 'Vigésimo tercero',
+                   'Vigésimo cuarto', 'Vigésimo quinto']
+
+list_rumanos = ['I ', 'I I ', 'I I I ', 'I V ', 'V ', 'V I ', 'V I I ', 'V I I I ', 'I X ', 'X ',
+                'X I ', 'X I I ', 'X I I I ', 'X I V ', 'X V ', 'X V I ', 'X V I I ', 'X V I I I ', 'X I X ', 'X X ',
+                'X X I ', 'X X I I ', 'X X I I I ', 'X X I V ', 'X X V ']
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Windows; Windows x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36'}
 
-url = 'https://www.adideandalucia.es/normas/ordenes/Orden15abril2011SubvencionesAsociaciones.pdf'
+url = 'https://www.adideandalucia.es/normas/decretos/Decreto5-2017GarantiaTiempoPago.pdf'
 response = requests.get(url=url, headers=headers, timeout=120)
 on_fly_mem_obj = io.BytesIO(response.content)
 pdf_file = PdfReader(on_fly_mem_obj)
@@ -16,6 +30,13 @@ markdown_content = ""
 
 # Variable para rastrear si nos encontramos en la sección de anexos
 en_anexos = False
+
+# Función para agregar "#" delante de las palabras encontradas
+
+
+def agregar_hashtag(match):
+    return '# ' + match.group(0)
+
 
 for pageNum in range(len(pdf_file.pages)):
     currentPage = pdf_file.pages[pageNum]
@@ -38,7 +59,36 @@ for pageNum in range(len(pdf_file.pages)):
     # Expresión regular para buscar el patrón "letra, paréntesis) y espacio"
     text = re.sub(r'([a-zA-Z])\)\s', '* ', text)
 
+    # Elimina los cuadrados de eleccion vacios
+    text = re.sub("˘", 'Falso: ', text)
+
+    # Elimina el cuadrado de eleccion marcado (pero no la respuesta)
+    text = re.sub("⾙", 'Verdadero: ', text)
+
+    # Convertir los Artículos en títulos para las secciones
     text = re.sub(r'Artículo', '# Artículo', text)
+    text = re.sub(r'INSTRUCCIONES', '# INSTRUCCIONES', text)
+
+    # Patrón para buscar las palabras en la lista
+    patron = re.compile(
+        r'\b(?:' + '|'.join(map(re.escape, list_order_fem)) + r')\b')
+
+    # Reemplazar las palabras con "#" delante
+    text = patron.sub(agregar_hashtag, text)
+
+    # Patrón para buscar las palabras en la lista
+    patron = re.compile(
+        r'\b(?:' + '|'.join(map(re.escape, list_order_masc)) + r')\b')
+
+    # Reemplazar las palabras con "#" delante
+    text = patron.sub(agregar_hashtag, text)
+
+    # Patrón para buscar las palabras en la lista
+    patron = re.compile(
+        r'\b(?:' + '|'.join(map(re.escape, list_rumanos)) + r')\b')
+
+    # Reemplazar las palabras con "#" delante
+    text = patron.sub(agregar_hashtag, text)
 
     # Verificar si estamos en la sección de anexos
     if re.search(r'ANEXO', text):
