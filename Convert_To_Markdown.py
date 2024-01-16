@@ -2,6 +2,7 @@ import io
 import re
 import requests
 from PyPDF2 import PdfReader
+from tabulate import tabulate
 
 list_order_fem = ['PRIMERA', 'SEGUNDA', 'TERCERA', 'CUARTA', 'QUINTA', 'SEXTA', 'SÉPTIMA', 'OCTAVA', 'NOVENA', 'DÉCIMA',
                   'UNDÉCIMA', 'DUODÉCIMA', 'DECIMOTERCERA', 'DECIMOCUARTA', 'DECIMOQUINTA', 'DECIMOSEXTA', 'DECIMOSÉPTIMA',
@@ -20,7 +21,7 @@ list_rumanos = ['I ', 'I I ', 'I I I ', 'I V ', 'V ', 'V I ', 'V I I ', 'V I I I
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Windows; Windows x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36'}
 
-url = 'https://www.adideandalucia.es/normas/decretos/Decreto5-2017GarantiaTiempoPago.pdf'
+url = 'https://www.adideandalucia.es/normas/circulares/Puntuacionesprimeraparteoposicioninspeccion2023.pdf'
 response = requests.get(url=url, headers=headers, timeout=120)
 on_fly_mem_obj = io.BytesIO(response.content)
 pdf_file = PdfReader(on_fly_mem_obj)
@@ -89,6 +90,19 @@ for pageNum in range(len(pdf_file.pages)):
 
     # Reemplazar las palabras con "#" delante
     text = patron.sub(agregar_hashtag, text)
+
+    if "Puntuaciones" in url:
+        lines = text.split('\n')
+
+        start_line = next((i + 1 for i, line in enumerate(lines)
+                           if "TURNON.ºD.N.I. APELLIDOS Y NOMBRE PUNTUACIÓNOBSERVACIONES" in line), None)
+
+        if start_line is not None:
+            headers = ["TURNO", "D.N.I.", "APELLIDOS Y NOMBRE",
+                       "PUNTUACIÓN", "OBSERVACIONES"]
+            filtered_lines = [line.strip().split(
+            ) for line in lines[start_line:] if line.startswith(("GENERAL", "DISCAPACIDAD"))]
+            text = tabulate(filtered_lines, headers, tablefmt="pipe")
 
     # Verificar si estamos en la sección de anexos
     if re.search(r'ANEXO', text):
